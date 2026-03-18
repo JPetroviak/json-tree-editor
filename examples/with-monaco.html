@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>json-tree-editor — Monaco demo</title>
+<link rel="stylesheet" href="../src/json-tree-editor.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,sans-serif;background:#0f1117;color:#d4d8f0;display:flex;flex-direction:column;height:100vh}
+  header{padding:12px 20px;background:#1a1d27;border-bottom:1px solid #2e3248;display:flex;align-items:center;gap:12px}
+  header h1{font-size:14px;font-weight:700}
+  header p{font-size:12px;color:#7a80a0}
+  #editor{flex:1;min-height:0}
+  #output{height:100px;padding:10px 16px;overflow-y:auto;background:#0d0f18;border-top:1px solid #2e3248;font-family:'Fira Code',Consolas,monospace;font-size:11px;color:#4caf80}
+  #output p{margin-bottom:3px}
+  .ts{color:#7a80a0;font-size:10px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>json-tree-editor + Monaco</h1>
+    <p>Passing the existing monaco namespace — no double-loading.</p>
+  </div>
+</header>
+<div id="editor"></div>
+<div id="output"><p><span class="ts">—</span> Events will appear here…</p></div>
+<script src="../src/json-tree-editor.js"></script>
+<script>
+require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' } });
+require(['vs/editor/editor.main'], function(monacoNS) {
+  var editor = new JsonTreeEditor('#editor', {
+    monaco: monacoNS,
+    defaultMode: 'tree',
+    theme: 'auto',
+    indent: '  ',
+    value: {
+      name: 'My Config', version: '2.0.0', active: true,
+      tags: ['production', 'stable'],
+      database: { host: 'localhost', port: 5432, ssl: false }
+    },
+    filename: 'config.json'
+  });
+  function log(msg) {
+    var out = document.getElementById('output');
+    var p = document.createElement('p');
+    p.innerHTML = '<span class="ts">'+new Date().toLocaleTimeString()+'</span>  '+msg;
+    out.insertBefore(p, out.firstChild);
+    while(out.children.length > 20) out.removeChild(out.lastChild);
+  }
+  editor.on('load',       function(d,fn)  { log('load → '+fn); });
+  editor.on('change',     function(d)      { log('change → '+JSON.stringify(d).length+' chars'); });
+  editor.on('save',       function(j,fn)   { log('save → '+fn); });
+  editor.on('copy',       function()        { log('copy'); });
+  editor.on('modeChange', function(mode)    { log('modeChange → '+mode); });
+  window.jte = editor;
+  log('Ready. Try: jte.getValue(), jte.setMode("code")');
+});
+</script>
+</body>
+</html>
