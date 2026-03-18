@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>json-tree-editor — Tree-only demo</title>
+<link rel="stylesheet" href="../src/json-tree-editor.css">
+<style>
+  body { margin: 0; background: #0f1117; display: flex; flex-direction: column; height: 100vh; }
+  #editor { flex: 1; min-height: 0; }
+</style>
+</head>
+<body>
+<div id="editor"></div>
+<script src="../src/json-tree-editor.js"></script>
+<script>
+  var editor = new JsonTreeEditor('#editor', {
+    showModeToggle: false,
+    value: {
+      greeting: "Hello, world!",
+      version: 1,
+      active: true,
+      tags: ["demo", "tree-only"],
+      config: { theme: "dark", fontSize: 13 }
+    },
+    filename: 'demo.json'
+  });
+  editor.on('change', function(data) { console.log('changed:', data); });
+</script>
+</body>
+</html>
